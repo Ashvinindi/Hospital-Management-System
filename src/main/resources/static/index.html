@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f7f6; }
+        h1 { color: #333; }
+        .container { display: flex; gap: 40px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); width: 45%; }
+        input, select, button { display: block; width: 100%; margin-bottom: 12px; padding: 10px; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        button:hover { background-color: #218838; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #e9ecef; margin-bottom: 8px; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<h1>🏥 Hospital Management System</h1>
+
+<div class="container">
+    <!-- Add & View Doctors -->
+    <div class="card">
+        <h2>Doctors</h2>
+        <form id="doctorForm">
+            <input type="text" id="docName" placeholder="Doctor Name" required>
+            <input type="text" id="docSpec" placeholder="Specialization" required>
+            <button type="submit">Add Doctor</button>
+        </form>
+        <h3>Doctor List</h3>
+        <ul id="doctorList"></ul>
+    </div>
+
+    <!-- Add & View Patients -->
+    <div class="card">
+        <h2>Patients</h2>
+        <form id="patientForm">
+            <input type="text" id="patName" placeholder="Patient Name" required>
+            <input type="number" id="patAge" placeholder="Age" required>
+            <input type="text" id="patGender" placeholder="Gender (Male/Female)" required>
+            <button type="submit">Add Patient</button>
+        </form>
+        <h3>Patient List</h3>
+        <ul id="patientList"></ul>
+    </div>
+</div>
+
+<script>
+    const API_URL = ""; // Empty string connects to the same host
+
+    // Fetch and display Doctors
+    async function loadDoctors() {
+        const res = await fetch(`${API_URL}/doctors`);
+        const doctors = await res.json();
+        const list = document.getElementById('doctorList');
+        list.innerHTML = doctors.map(d => `<li><b>${d.name}</b> - ${d.specialization}</li>`).join('');
+    }
+
+    // Fetch and display Patients
+    async function loadPatients() {
+        const res = await fetch(`${API_URL}/patients`);
+        const patients = await res.json();
+        const list = document.getElementById('patientList');
+        list.innerHTML = patients.map(p => `<li><b>${p.name}</b> (${p.age} yrs, ${p.gender})</li>`).join('');
+    }
+
+    // Add Doctor Form Submit
+    document.getElementById('doctorForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('docName').value;
+        const specialization = document.getElementById('docSpec').value;
+
+        await fetch(`${API_URL}/doctors`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, specialization })
+        });
+
+        document.getElementById('doctorForm').reset();
+        loadDoctors();
+    });
+
+    // Add Patient Form Submit
+    document.getElementById('patientForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('patName').value;
+        const age = document.getElementById('patAge').value;
+        const gender = document.getElementById('patGender').value;
+
+        await fetch(`${API_URL}/patients`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, age, gender })
+        });
+
+        document.getElementById('patientForm').reset();
+        loadPatients();
+    });
+
+    // Initial Load
+    loadDoctors();
+    loadPatients();
+</script>
+</body>
+</html>
